@@ -3,8 +3,6 @@
 #![feature(generic_const_exprs)]
 #![feature(generic_arg_infer)]
 
-pub mod with_locks;
-
 use core::cell::UnsafeCell;
 use core::mem::MaybeUninit;
 use core::sync::atomic::AtomicUsize;
@@ -109,6 +107,8 @@ impl<T, const N: usize> AtomicStaticVec<T, N> {
 
     fn resize_set(&mut self, new_len: usize) {
         self.len
+            .store(new_len, core::sync::atomic::Ordering::Relaxed);
+        self.write_len
             .store(new_len, core::sync::atomic::Ordering::Relaxed);
     }
 
